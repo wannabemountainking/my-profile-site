@@ -1,0 +1,1025 @@
+/* ==========================================================================
+   김도윤 展 — Tailwind로 표현하기 어려운 부분만 모아 둔 스타일
+   - 테마 색 변수(낮의 전시 / 밤의 전시)
+   - 내비게이션(스포트라이트, 관람 진행선, 안내도)
+   - 장식(블롭, 구름, 아치 액자, 타임라인, 캡션 카드)
+   - 애니메이션과 reduced-motion
+   ========================================================================== */
+
+/* ---------- 서체: 제목용 리디바탕 (단일 굵기라 굵게 대신 크기로 위계를 줍니다) ---------- */
+
+@font-face {
+    font-family: "RIDIBatang";
+    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/RIDIBatang.woff") format("woff");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ---------- 테마 색 변수 (RGB 값, tailwind.config에서 참조) ---------- */
+
+/* 낮의 전시: 빛바랜 종이 위 파스텔 (채도를 낮춰 오래된 엽서 느낌) */
+:root {
+    --paper: 248 241 228;
+    --surface: 253 250 242;
+    --ink: 64 57 62;
+    --ink-soft: 118 106 104;
+    --line: 226 212 196;
+    --accent: 166 96 104;
+    --shadow: 120 92 80;
+
+    --blush: 240 216 206;
+    --lilac: 225 218 232;
+    --mint: 210 226 210;
+    --butter: 242 228 184;
+    --sky: 214 226 232;
+
+    --spotlight: var(--blush);
+    color-scheme: light;
+}
+
+/* 밤의 전시: 빛의 제국 (낮의 하늘 아래 밤의 거리) */
+.dark {
+    --paper: 20 27 46;      /* night */
+    --surface: 31 42 71;    /* dusk */
+    --ink: 244 241 234;     /* cloud */
+    --ink-soft: 196 202 216;
+    --line: 54 68 104;
+    --accent: 243 201 105;  /* lamp */
+    --shadow: 4 6 14;
+
+    --blush: 74 58 88;
+    --lilac: 58 64 108;
+    --mint: 44 78 70;
+    --butter: 86 72 42;
+    --sky: 46 74 116;
+
+    --spotlight: 243 201 105;
+    color-scheme: dark;
+}
+
+/* ---------- 기본 ---------- */
+
+html {
+    scroll-behavior: smooth;
+}
+
+section[id] {
+    scroll-margin-top: 6rem;
+}
+
+::selection {
+    background: rgb(var(--blush));
+    color: rgb(var(--ink));
+}
+
+.dark ::selection {
+    background: rgb(var(--accent) / 0.35);
+}
+
+:focus-visible {
+    outline: 2px solid rgb(var(--accent));
+    outline-offset: 3px;
+    border-radius: 0.5rem;
+}
+
+/* 종이 질감 노이즈 */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.09;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.dark body::after {
+    opacity: 0.07;
+    mix-blend-mode: soft-light;
+}
+
+/* 테마 전환 시 부드러운 색 변화 (main.js가 잠시 붙였다 뗍니다) */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+    transition: background-color 0.6s ease, color 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease !important;
+}
+
+.skip-link {
+    position: fixed;
+    left: 1rem;
+    top: -4rem;
+    z-index: 200;
+    padding: 0.6rem 1rem;
+    border-radius: 9999px;
+    background: rgb(var(--ink));
+    color: rgb(var(--paper));
+    font-weight: 500;
+    transition: top 0.2s;
+}
+
+.skip-link:focus {
+    top: 1rem;
+}
+
+/* ---------- 버튼 ---------- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background: rgb(var(--ink));
+    color: rgb(var(--paper));
+    box-shadow: 0 10px 24px -12px rgb(var(--shadow) / 0.6);
+}
+
+.dark .btn-primary {
+    background: rgb(var(--accent));
+    color: #141B2E;
+    box-shadow: 0 0 28px -6px rgb(var(--accent) / 0.55);
+}
+
+.btn-ghost {
+    border: 1px solid rgb(var(--line));
+    background: rgb(var(--surface) / 0.7);
+    color: rgb(var(--ink));
+}
+
+.btn-ghost:hover {
+    background: rgb(var(--surface));
+}
+
+/* ---------- 내비게이션: 관람 안내 ---------- */
+
+.nav-bar {
+    background: rgb(var(--surface) / 0.55);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#site-header.is-scrolled .nav-bar {
+    background: rgb(var(--surface) / 0.88);
+    box-shadow: 0 12px 30px -18px rgb(var(--shadow) / 0.5);
+}
+
+.nav-link {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    padding: 0.7rem 1.1rem;
+    border-radius: 9999px;
+    font-size: 17px;
+    font-weight: 500;
+    color: rgb(var(--ink-soft));
+    transition: color 0.25s ease;
+}
+
+.nav-link:hover,
+.nav-link.is-active {
+    color: rgb(var(--ink));
+}
+
+.nav-num {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: rgb(var(--accent));
+}
+
+/* 현재 섹션을 비추는 스포트라이트 */
+.nav-spotlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    border-radius: 9999px;
+    background: rgb(var(--spotlight) / 0.7);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), width 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+}
+
+.dark .nav-spotlight {
+    background: rgb(var(--spotlight) / 0.14);
+    box-shadow: 0 0 22px -2px rgb(var(--spotlight) / 0.45), inset 0 0 0 1px rgb(var(--spotlight) / 0.35);
+}
+
+/* 관람 진행선 */
+.nav-progress {
+    position: relative;
+    height: 7px;
+    margin: 0.55rem 2rem 0;
+}
+
+.nav-progress-track,
+.nav-progress-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 3px;
+    height: 1px;
+}
+
+.nav-progress-track {
+    background: rgb(var(--line));
+}
+
+.nav-progress-fill {
+    background: rgb(var(--accent));
+    transform-origin: left;
+    transform: scaleX(0);
+}
+
+.nav-dot {
+    position: absolute;
+    top: 0;
+    width: 7px;
+    height: 7px;
+    margin-left: -3.5px;
+    border-radius: 9999px;
+    border: 1px solid rgb(var(--accent) / 0.6);
+    background: rgb(var(--paper));
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-dot.is-passed {
+    background: rgb(var(--accent));
+}
+
+.nav-dot.is-current {
+    transform: scale(1.35);
+}
+
+/* 낮 / 밤 토글 */
+.theme-toggle {
+    position: relative;
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 9999px;
+    border: 1px solid rgb(var(--line));
+    background: rgb(var(--paper) / 0.7);
+}
+
+.theme-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: rgb(var(--ink-soft));
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.theme-day {
+    background: rgb(var(--butter));
+    color: rgb(var(--ink));
+}
+
+.dark .theme-day {
+    background: transparent;
+    color: rgb(var(--ink-soft));
+}
+
+.dark .theme-night {
+    background: rgb(var(--accent));
+    color: #141B2E;
+}
+
+.guide-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.8rem;
+    border-radius: 9999px;
+    border: 1px solid rgb(var(--line));
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgb(var(--ink));
+    background: rgb(var(--surface) / 0.7);
+}
+
+/* 모바일 전시 안내도 */
+.guide {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1.5rem 2rem;
+    overflow-y: auto;
+    background: rgb(var(--paper));
+    color: rgb(var(--ink));
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.guide[hidden] {
+    display: none;
+}
+
+.guide.is-open {
+    opacity: 1;
+    transform: none;
+}
+
+.guide-link {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem 0.5rem;
+    border-bottom: 1px solid rgb(var(--line));
+}
+
+.guide-num {
+    width: 3rem;
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 2.25rem;
+    line-height: 1;
+    color: rgb(var(--accent));
+}
+
+.guide-link strong {
+    display: block;
+    font-family: "RIDIBatang", serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+}
+
+.guide-link small {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.85rem;
+    color: rgb(var(--ink-soft));
+}
+
+/* ---------- Hero 장식 ---------- */
+
+/* 낮: 파스텔 블롭 */
+.blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(60px);
+    opacity: 0.75;
+    animation: float 16s ease-in-out infinite;
+}
+
+.blob-1 { width: 26rem; height: 26rem; top: -6rem; left: -8rem; }
+.blob-2 { width: 22rem; height: 22rem; top: 20%; right: -6rem; animation-delay: -5s; }
+.blob-3 { width: 18rem; height: 18rem; bottom: -4rem; left: 35%; animation-delay: -10s; }
+
+/* 밤: 빛의 제국 */
+.night-sky {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 55%;
+    background: linear-gradient(to bottom, rgb(141 180 221 / 0.22), transparent);
+}
+
+.cloud-drift {
+    position: absolute;
+    color: #F4F1EA;
+    opacity: 0.16;
+    animation: drift 60s linear infinite;
+}
+
+.cloud-a { width: 15rem; height: 7.5rem; top: 12%; left: -16rem; }
+.cloud-b { width: 10rem; height: 5rem; top: 28%; left: -12rem; animation-duration: 80s; animation-delay: -30s; }
+.cloud-c { width: 20rem; height: 10rem; top: 4%; left: -22rem; animation-duration: 100s; animation-delay: -65s; }
+
+.lamp-glow {
+    position: absolute;
+    left: 50%;
+    bottom: -12rem;
+    width: 34rem;
+    height: 24rem;
+    transform: translateX(-50%);
+    border-radius: 9999px;
+    background: radial-gradient(closest-side, rgb(243 201 105 / 0.22), transparent);
+}
+
+/* ---------- Hero 창: 하단이 화면에서 잘리는 큰 아치 창 ----------
+   창 안(.window-pane)만 반원으로 자르고, 구름·언덕·빛은 창 밖에 두어
+   풍경이 프레임을 넘나들게 합니다. 위치는 창 너비 기준(cqw)으로 잡습니다. */
+
+.hero-window {
+    --cut: 7rem; /* 화면 아래로 잘려 나가는 길이 */
+    position: relative;
+    z-index: 10;
+    container-type: inline-size;
+    width: min(92%, 30rem);
+    height: 36rem;
+    margin: 3.5rem auto calc(var(--cut) * -1);
+}
+
+@media (min-width: 640px) {
+    .hero-window {
+        height: 42rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-window {
+        --cut: 6rem;
+        position: absolute;
+        top: 7rem;
+        right: 4vw;
+        bottom: calc(var(--cut) * -1);
+        width: min(48vw, 46rem);
+        height: auto;
+        margin: 0;
+    }
+}
+
+/* 창 뒤로 번지는 빛 */
+.window-glow {
+    position: absolute;
+    inset: -14% -28% 35%;
+    border-radius: 9999px;
+    background: radial-gradient(closest-side, rgb(var(--butter) / 0.9), rgb(var(--blush) / 0.35) 60%, transparent);
+    filter: blur(30px);
+    pointer-events: none;
+}
+
+.dark .window-glow {
+    background: radial-gradient(closest-side, rgb(141 180 221 / 0.26), transparent);
+}
+
+/* 창 안: 반원으로 자른 풍경 */
+.window-pane {
+    position: absolute;
+    inset: 10px 10px 0;
+    overflow: hidden;
+    border-radius: 9999px 9999px 0 0;
+}
+
+.pane-day {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgb(var(--butter)), rgb(var(--blush)) 72%);
+}
+
+.pane-sun {
+    position: absolute;
+    top: 16cqw;
+    right: 16%;
+    width: 26%;
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    background: rgb(var(--surface));
+    box-shadow: 0 0 70px 14px rgb(var(--surface) / 0.55);
+}
+
+/* 창틀: 테두리 전체가 아니라 위쪽 몰딩만 남기고 아래로 사라집니다 */
+.window-frame {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border: 10px solid rgb(var(--surface));
+    border-bottom: 0;
+    border-radius: 9999px 9999px 0 0;
+    -webkit-mask-image: linear-gradient(to bottom, #000 38%, transparent 86%);
+    mask-image: linear-gradient(to bottom, #000 38%, transparent 86%);
+    pointer-events: none;
+}
+
+.window-frame::before {
+    content: "";
+    position: absolute;
+    inset: -10px -10px 0;
+    border: 1px solid rgb(var(--ink) / 0.14);
+    border-bottom: 0;
+    border-radius: 9999px 9999px 0 0;
+}
+
+.dark .window-frame {
+    border-color: #0D0F15;
+}
+
+.dark .window-frame::before {
+    border-color: rgb(var(--accent) / 0.45);
+}
+
+/* 창 밖으로 흘러나오는 언덕 (낮) */
+.window-hills {
+    position: absolute;
+    z-index: 2;
+    left: -45%;
+    bottom: 0;
+    width: 145%;
+    height: calc(40% + var(--cut) * 0.5);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 32%);
+    mask-image: linear-gradient(to right, transparent, #000 32%);
+    pointer-events: none;
+}
+
+.hill-mint { fill: rgb(var(--mint)); }
+.hill-lilac { fill: rgb(var(--lilac)); }
+
+/* 창 안팎을 넘나드는 구름 */
+.sky-cloud {
+    position: absolute;
+    z-index: 3;
+    height: auto;
+    color: #FFFDF7;
+    filter: drop-shadow(0 8px 14px rgb(var(--shadow) / 0.22));
+    animation: sway 10s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.sky-cloud.c1 { left: -30%; top: 40cqw; width: 40%; }                         /* 왼쪽 경계에 걸쳐 글자 영역까지 */
+.sky-cloud.c2 { right: -12%; top: 14cqw; width: 26%; animation-duration: 13s; animation-direction: reverse; } /* 오른쪽 경계에 걸침 */
+.sky-cloud.c3 { left: 14%; top: 72cqw; width: 15%; animation-duration: 8s; }  /* 창 안 */
+.sky-cloud.c4 { left: -62%; top: 3cqw; width: 22%; animation-duration: 15s; } /* 창 밖 */
+
+@media (max-width: 1023px) {
+    .sky-cloud.c1 { left: -12%; }
+    .sky-cloud.c4 { left: -4%; top: -14cqw; width: 26%; }
+}
+
+.dark .sky-cloud {
+    color: #F4F1EA;
+    filter: drop-shadow(0 8px 18px rgb(0 0 0 / 0.35));
+}
+
+.dark .sky-cloud.c4 {
+    opacity: 0.35;
+}
+
+/* 콜라주: 창틀 어깨를 붙잡은 찢긴 테이프 */
+.collage-tape {
+    position: absolute;
+    z-index: 4;
+    top: calc(16cqw - 0.85rem);
+    right: calc(13.3cqw - 3.5rem);
+    width: 7rem;
+    height: 1.7rem;
+    background: rgb(var(--butter) / 0.9);
+    transform: rotate(-43deg);
+    clip-path: polygon(0 0, 8% 14%, 4% 30%, 10% 46%, 3% 62%, 9% 80%, 0 100%, 100% 100%, 92% 82%, 97% 62%, 90% 44%, 96% 26%, 92% 0);
+}
+
+/* 작품 라벨: 언덕 위에 붙인 캡션 */
+.window-label {
+    position: absolute;
+    z-index: 4;
+    right: 9%;
+    bottom: calc(var(--cut) + 2.25rem);
+    padding: 0.45rem 0.9rem;
+    background: rgb(var(--surface));
+    font-size: 0.8rem;
+    color: rgb(var(--ink-soft));
+    box-shadow: 0 10px 24px -14px rgb(var(--shadow) / 0.6);
+    transform: rotate(-3deg);
+}
+
+.window-label::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -0.55rem;
+    width: 3.2rem;
+    height: 1rem;
+    background: rgb(var(--butter) / 0.85);
+    transform: translateX(-50%) rotate(4deg);
+}
+
+/* 밤: 창 안은 낮의 하늘, 아래는 밤의 거리 (빛의 제국) */
+.arch-sky {
+    background: linear-gradient(to bottom, #8DB4DD, #C9DDF0 70%, #DDE8F2);
+}
+
+.arch-street {
+    position: absolute;
+    inset: auto 0 0;
+    height: calc(16% + var(--cut));
+    background: linear-gradient(to bottom, #1F2A47, #0D0F15);
+}
+
+.arch-street::after {
+    content: "";
+    position: absolute;
+    left: 22%;
+    top: -0.4rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 9999px;
+    background: #F3C969;
+    box-shadow: 0 0 18px 6px rgb(243 201 105 / 0.55);
+}
+
+/* 낮: 빛바랜 종이의 가장자리 그늘(비네트) */
+:root:not(.dark) body {
+    background-image: radial-gradient(ellipse at 50% 40%, transparent 55%, rgb(120 90 60 / 0.1) 100%);
+    background-attachment: fixed;
+}
+
+.float-slow { animation: hover 6s ease-in-out infinite; }
+.float-slower { animation: hover 7.5s ease-in-out infinite; animation-delay: -2s; }
+
+/* ---------- 섹션 공통 ---------- */
+
+.section {
+    padding: 6rem 0;
+}
+
+@media (min-width: 768px) {
+    .section {
+        padding: 8rem 0;
+    }
+}
+
+.room-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgb(var(--ink-soft));
+}
+
+.room-num {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: rgb(var(--accent));
+}
+
+.room-line {
+    width: 2.5rem;
+    height: 1px;
+    background: rgb(var(--accent) / 0.5);
+}
+
+.section-title {
+    margin-top: 0.75rem;
+    font-family: "RIDIBatang", serif;
+    font-weight: 400;
+    font-size: 2.25rem;
+    line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+    .section-title {
+        font-size: 3rem;
+    }
+}
+
+/* 전시 서문 */
+.drop-cap::first-letter {
+    float: left;
+    margin: 0.35rem 0.6rem 0 0;
+    font-size: 3.6em;
+    line-height: 0.8;
+    font-weight: 700;
+    color: rgb(var(--accent));
+}
+
+.statement {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.2rem 0.4rem;
+    font-weight: 700;
+    background: linear-gradient(to top, rgb(var(--butter)) 45%, transparent 45%);
+}
+
+.dark .statement {
+    background: linear-gradient(to top, rgb(var(--accent) / 0.25) 40%, transparent 40%);
+}
+
+/* 타임라인 */
+.timeline {
+    position: relative;
+    padding-left: 2.25rem;
+}
+
+.timeline::before {
+    content: "";
+    position: absolute;
+    left: 0.55rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 1px;
+    background: linear-gradient(to bottom, rgb(var(--accent) / 0.6), rgb(var(--line)));
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2.75rem;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-item::before {
+    content: "";
+    position: absolute;
+    left: -2.25rem;
+    top: 0.25rem;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 9999px;
+    background: rgb(var(--dot));
+    border: 3px solid rgb(var(--paper));
+    box-shadow: 0 0 0 1px rgb(var(--accent) / 0.45);
+}
+
+.timeline-chapter {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: rgb(var(--accent));
+}
+
+.timeline-title {
+    margin-top: 0.15rem;
+    font-family: "RIDIBatang", serif;
+    font-weight: 400;
+    font-size: 1.35rem;
+}
+
+.timeline-text {
+    margin-top: 0.5rem;
+    line-height: 1.85;
+    color: rgb(var(--ink-soft));
+}
+
+/* 기술: 작품 캡션 카드 */
+.caption-card {
+    border-radius: 1.5rem;
+    border: 1px solid rgb(var(--line));
+    background: rgb(var(--surface));
+    padding: 0.75rem 0.75rem 1.75rem;
+    box-shadow: 0 18px 40px -20px rgb(var(--shadow) / 0.35);
+    transition: translate 0.3s ease;
+}
+
+/* .reveal이 transform을 쓰므로 hover는 translate 속성으로 띄웁니다 */
+.caption-card:hover {
+    translate: 0 -4px;
+}
+
+.caption-swatch {
+    display: flex;
+    align-items: flex-end;
+    height: 8rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: 1.1rem;
+}
+
+.caption-swatch span {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 3rem;
+    line-height: 1;
+    color: rgb(var(--ink) / 0.75);
+}
+
+.caption-no,
+.caption-title,
+.caption-meta,
+.caption-text,
+.chip-list {
+    padding: 0 1rem;
+}
+
+.caption-no {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: rgb(var(--ink-soft));
+}
+
+.caption-title {
+    margin-top: 0.35rem;
+    font-family: "RIDIBatang", serif;
+    font-weight: 400;
+    font-size: 1.4rem;
+}
+
+.caption-meta {
+    margin-top: 0.15rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgb(var(--accent));
+}
+
+.caption-text {
+    margin-top: 0.85rem;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: rgb(var(--ink-soft));
+}
+
+.chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1.1rem;
+}
+
+.chip-list li {
+    padding: 0.25rem 0.7rem;
+    border-radius: 9999px;
+    border: 1px solid rgb(var(--line));
+    font-size: 0.8rem;
+    color: rgb(var(--ink));
+}
+
+/* 프로젝트: 전시 포스터 카드 */
+.project-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 1.75rem;
+    border: 1px solid rgb(var(--line));
+    background: rgb(var(--surface));
+    padding: 0.75rem;
+    box-shadow: 0 18px 40px -20px rgb(var(--shadow) / 0.35);
+    transition: translate 0.3s ease;
+}
+
+.project-card:hover {
+    translate: 0 -4px;
+}
+
+.project-poster {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 10rem;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    padding: 1.25rem 1.5rem;
+}
+
+.project-poster img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.project-poster::after {
+    content: "";
+    position: absolute;
+    right: -2rem;
+    top: -2rem;
+    width: 8rem;
+    height: 8rem;
+    border-radius: 9999px;
+    background: rgb(var(--surface) / 0.45);
+}
+
+.project-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1.5rem 1rem 1rem;
+}
+
+.project-caption {
+    display: none;
+}
+
+/* 밤: 액자 프레임과 마그리트풍 캡션 */
+.dark .project-card {
+    border: 1px solid rgb(var(--accent) / 0.35);
+    box-shadow: inset 0 0 0 6px #0D0F15, inset 0 0 0 7px rgb(var(--accent) / 0.25), 0 30px 60px -30px #000;
+    padding: 1rem;
+}
+
+.dark .project-poster {
+    background-image: linear-gradient(to bottom, #8DB4DD, #C9DDF0);
+}
+
+.dark .project-poster .poster-num {
+    color: #141B2E;
+}
+
+.dark .project-poster::after {
+    background: #F4F1EA;
+    opacity: 0.75;
+    width: 6rem;
+    height: 3rem;
+    right: 1.5rem;
+    top: 1.5rem;
+    filter: blur(1px);
+}
+
+.dark .project-caption {
+    display: block;
+}
+
+.project-card.is-upcoming {
+    border-style: dashed;
+    background: transparent;
+    box-shadow: none;
+}
+
+.dark .project-card.is-upcoming {
+    box-shadow: none;
+    border: 1px dashed rgb(var(--accent) / 0.4);
+}
+
+/* 토스트 */
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 2rem;
+    z-index: 120;
+    padding: 0.75rem 1.25rem;
+    border-radius: 9999px;
+    background: rgb(var(--ink));
+    color: rgb(var(--paper));
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 1rem);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* ---------- 스크롤 등장 ---------- */
+
+.js .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--delay, 0ms);
+}
+
+.js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* ---------- 키프레임 ---------- */
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(24px, -18px) scale(1.05); }
+    66% { transform: translate(-18px, 14px) scale(0.97); }
+}
+
+@keyframes drift {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(100vw + 30rem)); }
+}
+
+@keyframes sway {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(10px); }
+}
+
+@keyframes hover {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -8px; }
+}
+
+/* ---------- 동작 줄이기 ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .js .reveal {
+        opacity: 1;
+        transform: none;
+    }
+}

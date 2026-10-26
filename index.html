@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoonie 展 — 큐레이터 · iOS 개발자 지망생</title>
+    <meta name="description" content="유물을 읽던 눈으로, 이제 코드를 읽습니다. 큐레이터이자 iOS 개발자 지망생 Yoonie의 작은 전시.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="김도윤 展 — 한 사람의 작은 전시">
+    <meta property="og:description" content="큐레이터 · iOS 개발자 지망생 김도윤의 프로필">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
+
+    <!-- 화면을 그리기 전에 테마를 정해 깜빡임을 막습니다 -->
+    <script>
+        (function () {
+            var root = document.documentElement;
+            var saved = null;
+            root.classList.add('js');
+            try { saved = localStorage.getItem('theme'); } catch (e) { /* 저장소 사용 불가 */ }
+            var isDark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (isDark) root.classList.add('dark');
+        })();
+    </script>
+
+    <!-- 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- 제목용 리디바탕은 css/styles.css의 @font-face에서 불러옵니다 -->
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        /** 색은 css/styles.css의 CSS 변수를 참조합니다. 테마가 바뀌면 변수만 바뀝니다. */
+        const token = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        paper: token('paper'),
+                        surface: token('surface'),
+                        ink: token('ink'),
+                        'ink-soft': token('ink-soft'),
+                        line: token('line'),
+                        accent: token('accent'),
+                        blush: token('blush'),
+                        lilac: token('lilac'),
+                        mint: token('mint'),
+                        butter: token('butter'),
+                        sky: token('sky'),
+                        // 다크 모드(빛의 제국) 전용 고정 색
+                        lamp: '#F3C969',
+                        apple: '#8FBF7A',
+                        bowler: '#0D0F15',
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans KR"', 'system-ui', 'sans-serif'],
+                        serif: ['"RIDIBatang"', 'serif'],
+                        display: ['"Cormorant Garamond"', 'serif'],
+                    },
+                    boxShadow: {
+                        soft: '0 18px 40px -20px rgb(var(--shadow) / 0.35)',
+                    },
+                },
+            },
+        };
+    </script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-paper font-sans text-ink antialiased">
+
+    <!-- SVG 모티프 모음 (구름, 중절모, 사과) -->
+    <svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
+        <symbol id="cloud" viewBox="0 0 200 100">
+            <g fill="currentColor">
+                <circle cx="60" cy="62" r="30"/>
+                <circle cx="102" cy="44" r="38"/>
+                <circle cx="146" cy="60" r="28"/>
+                <rect x="34" y="58" width="138" height="34" rx="17"/>
+            </g>
+        </symbol>
+        <symbol id="bowler" viewBox="0 0 120 70">
+            <path d="M30 50 C30 16 45 4 60 4 C75 4 90 16 90 50 Z" fill="#0D0F15"/>
+            <rect x="30" y="40" width="60" height="8" fill="#2B3142"/>
+            <ellipse cx="60" cy="54" rx="54" ry="10" fill="#0D0F15"/>
+        </symbol>
+        <symbol id="apple" viewBox="0 0 100 110">
+            <path d="M50 32 C35 20 8 24 8 57 C8 87 30 106 42 106 C47 106 48 103 50 103 C52 103 53 106 58 106 C70 106 92 87 92 57 C92 24 65 20 50 32 Z" fill="#8FBF7A"/>
+            <ellipse cx="32" cy="55" rx="7" ry="13" fill="#B6D9A6" opacity=".7"/>
+            <path d="M50 32 C50 22 52 13 57 6" stroke="#5B4636" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M54 22 C62 8 78 8 84 12 C78 23 65 27 54 22 Z" fill="#6FA35C"/>
+        </symbol>
+    </svg>
+
+    <a href="#about" class="skip-link">본문으로 건너뛰기</a>
+
+    <!-- 상단 내비게이션: 관람 안내 -->
+    <header id="site-header" class="fixed inset-x-0 top-0 z-50">
+        <div class="mx-auto max-w-6xl px-4 pt-3">
+            <nav class="nav-bar flex items-center justify-between gap-3 rounded-full border border-line/80 px-3 py-2 sm:px-4" aria-label="주 메뉴">
+                <a href="#top" class="logo flex items-baseline gap-1 rounded-full px-2 py-1 font-serif text-lg text-ink sm:text-xl" aria-label="맨 위로 이동">
+                    도윤 <span class="text-accent">展</span>
+                </a>
+
+                <div class="relative hidden md:block">
+                    <span id="nav-spotlight" class="nav-spotlight" aria-hidden="true"></span>
+                    <ul id="nav-list" class="relative flex items-center gap-2">
+                        <li><a class="nav-link" href="#about" data-section="about"><span class="nav-num">01</span>소개</a></li>
+                        <li><a class="nav-link" href="#journey" data-section="journey"><span class="nav-num">02</span>여정</a></li>
+                        <li><a class="nav-link" href="#skills" data-section="skills"><span class="nav-num">03</span>기술</a></li>
+                        <li><a class="nav-link" href="#projects" data-section="projects"><span class="nav-num">04</span>프로젝트</a></li>
+                        <li><a class="nav-link" href="#contact" data-section="contact"><span class="nav-num">05</span>연락</a></li>
+                    </ul>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button id="theme-toggle" type="button" class="theme-toggle" aria-pressed="false" aria-label="밤의 전시(다크 모드)">
+                        <span class="theme-option theme-day">
+                            <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>
+                            낮
+                        </span>
+                        <span class="theme-option theme-night">
+                            <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="currentColor"/></svg>
+                            밤
+                        </span>
+                    </button>
+                    <button id="guide-open" type="button" class="guide-button md:hidden" aria-expanded="false" aria-controls="guide">
+                        <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        안내도
+                    </button>
+                </div>
+            </nav>
+
+            <!-- 관람 진행선 -->
+            <div id="nav-progress" class="nav-progress" aria-hidden="true">
+                <span class="nav-progress-track"></span>
+                <span id="nav-progress-fill" class="nav-progress-fill"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 모바일 전시 안내도 -->
+    <div id="guide" class="guide" role="dialog" aria-modal="true" aria-labelledby="guide-title" hidden>
+        <div class="flex items-center justify-between">
+            <p id="guide-title" class="font-serif text-xl">전시 안내도</p>
+            <button id="guide-close" type="button" class="guide-button" aria-label="안내도 닫기">
+                <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                닫기
+            </button>
+        </div>
+        <ol class="mt-10 space-y-2">
+            <li><a class="guide-link" href="#about"><span class="guide-num">01</span><span><strong>소개</strong><small>전시 서문</small></span></a></li>
+            <li><a class="guide-link" href="#journey"><span class="guide-num">02</span><span><strong>여정</strong><small>관람 동선</small></span></a></li>
+            <li><a class="guide-link" href="#skills"><span class="guide-num">03</span><span><strong>기술</strong><small>소장품</small></span></a></li>
+            <li><a class="guide-link" href="#projects"><span class="guide-num">04</span><span><strong>프로젝트</strong><small>상설 전시</small></span></a></li>
+            <li><a class="guide-link" href="#contact"><span class="guide-num">05</span><span><strong>연락</strong><small>방명록</small></span></a></li>
+        </ol>
+        <p class="mt-auto pt-10 font-display text-lg italic text-ink-soft">A small exhibition by Doyoon Kim</p>
+    </div>
+
+    <main>
+        <!-- Hero: 전시 포스터 -->
+        <section id="top" class="hero relative overflow-hidden pt-32 lg:flex lg:min-h-[100svh] lg:items-center lg:pb-24">
+            <!-- 낮: 파스텔 블롭 -->
+            <div class="pointer-events-none absolute inset-0 dark:hidden" aria-hidden="true">
+                <span class="blob blob-1 bg-blush"></span>
+                <span class="blob blob-2 bg-lilac"></span>
+                <span class="blob blob-3 bg-mint"></span>
+            </div>
+            <!-- 밤: 빛의 제국 -->
+            <div class="pointer-events-none absolute inset-0 hidden dark:block" aria-hidden="true">
+                <span class="night-sky"></span>
+                <svg class="cloud-drift cloud-a"><use href="#cloud"/></svg>
+                <svg class="cloud-drift cloud-b"><use href="#cloud"/></svg>
+                <svg class="cloud-drift cloud-c"><use href="#cloud"/></svg>
+                <span class="lamp-glow"></span>
+            </div>
+
+            <!-- 글자는 그림 위(z-20)에 둡니다. 구름과 언덕은 이 영역까지 넘어옵니다 -->
+            <div class="relative z-20 mx-auto w-full max-w-6xl px-5 md:px-8">
+                <div class="reveal lg:max-w-[34rem]">
+                    <p class="font-display text-xl italic tracking-wide text-accent">A Small Exhibition</p>
+                    <h1 class="mt-3 font-serif text-6xl leading-tight sm:text-7xl md:text-8xl">김도윤</h1>
+                    <p class="mt-4 text-lg font-medium text-ink-soft sm:text-xl">큐레이터 <span class="mx-1 text-accent">·</span> iOS 개발자 지망생</p>
+                    <p class="mt-8 max-w-md font-sans text-xl leading-relaxed sm:text-2xl">
+                        유물을 읽던 눈으로,<br>이제 코드를 읽습니다.
+                    </p>
+                    <div class="mt-10 flex flex-wrap gap-3">
+                        <a href="#about" class="btn btn-primary">전시 서문 보기</a>
+                        <a href="#contact" class="btn btn-ghost">방명록 남기기</a>
+                    </div>
+                    <dl class="mt-12 grid max-w-md grid-cols-3 gap-4 border-t border-line pt-5 text-sm">
+                        <div><dt class="text-ink-soft">전시실</dt><dd class="mt-1 font-medium">Room 01–05</dd></div>
+                        <div><dt class="text-ink-soft">기획</dt><dd class="mt-1 font-medium">김도윤</dd></div>
+                        <div><dt class="text-ink-soft">관람</dt><dd class="mt-1 font-medium">상시 개방</dd></div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- 큰 아치 창: 하단은 화면에서 잘리고, 풍경은 창틀을 넘나듭니다 (css/styles.css의 Hero 창) -->
+            <figure class="hero-window reveal" style="--delay: 120ms">
+                <span class="window-glow" aria-hidden="true"></span>
+
+                <!-- 창 안 -->
+                <div class="window-pane" aria-hidden="true">
+                    <!-- 낮의 하늘 -->
+                    <div class="pane-day dark:hidden"><span class="pane-sun"></span></div>
+                    <!-- 빛의 제국: 낮의 하늘, 떠 있는 중절모와 사과, 밤의 거리 -->
+                    <div class="arch-sky absolute inset-0 hidden dark:block">
+                        <svg class="float-slow absolute left-1/2 top-[22%] h-20 w-32 -translate-x-1/2 lg:h-28 lg:w-44"><use href="#bowler"/></svg>
+                        <svg class="float-slower absolute left-1/2 top-[40%] h-20 w-20 -translate-x-1/2 lg:h-28 lg:w-28"><use href="#apple"/></svg>
+                        <span class="arch-street"></span>
+                    </div>
+                </div>
+                <span class="window-frame" aria-hidden="true"></span>
+
+                <!-- 창 밖으로 흘러나오는 언덕 -->
+                <svg class="window-hills dark:hidden" viewBox="0 0 600 200" preserveAspectRatio="none" aria-hidden="true">
+                    <ellipse class="hill-mint" cx="250" cy="215" rx="320" ry="150"/>
+                    <ellipse class="hill-lilac" cx="500" cy="210" rx="200" ry="122"/>
+                </svg>
+
+                <!-- 창 안팎을 넘나드는 구름 -->
+                <svg class="sky-cloud c1" viewBox="0 0 200 100" aria-hidden="true"><use href="#cloud"/></svg>
+                <svg class="sky-cloud c2" viewBox="0 0 200 100" aria-hidden="true"><use href="#cloud"/></svg>
+                <svg class="sky-cloud c3" viewBox="0 0 200 100" aria-hidden="true"><use href="#cloud"/></svg>
+                <svg class="sky-cloud c4" viewBox="0 0 200 100" aria-hidden="true"><use href="#cloud"/></svg>
+
+                <span class="collage-tape dark:hidden" aria-hidden="true"></span>
+                <figcaption class="window-label">
+                    <span class="dark:hidden">「낮의 전시」, 파스텔 위 종이</span>
+                    <span class="hidden dark:inline">「빛의 제국」에 바치는 오마주</span>
+                </figcaption>
+            </figure>
+        </section>
+
+        <!-- Room 01: 소개 -->
+        <section id="about" class="section" aria-labelledby="about-title">
+            <div class="mx-auto max-w-6xl px-5 md:px-8">
+                <div class="room-label reveal"><span class="room-num">Room 01</span><span class="room-line"></span><span>전시 서문</span></div>
+                <h2 id="about-title" class="section-title reveal">소개</h2>
+
+                <div class="mt-12 grid gap-12 md:grid-cols-[1.6fr_1fr]">
+                    <div class="preface reveal space-y-6 font-sans text-lg leading-[2] text-ink sm:text-xl sm:leading-[2]">
+                        <p class="drop-cap">큐레이터 생활 대부분은 전시 준비를 위해 유물과 특정 대상을 정해 이에 대한 자료조사를 하고, 어떤 전시를 할지 생각하며 하루를 보낸다.</p>
+                        <p>지금은 육아휴직 중이어서 그 기간 동안에 Python과 iOS 개발에 대해 알게 되었다. 그리고 그 기술은 복직 후에 나의 삶을 개선시켜 주었다. 연구조사의 대부분을 Python으로 실용적이고 정확하게 고치기도 하고, 몇몇 서류 작업을 자동화할 수 있었다.</p>
+                        <p>그리고 또다시 집안일로 휴직을 하면서 개발을 꿈꾸게 된다. 그런데 등장한 인공지능 기술은 개발자가 무엇을 해야 하는지 가장 먼저 고민하게 만들었고, 나는 고민 끝에 인공지능으로는 생산성 향상을 도모하고 컴퓨터에 대한 지식을 쌓아 가기로 결정했다.</p>
+                        <p class="statement">나는 개발자 지망생이다.</p>
+                    </div>
+
+                    <!-- 작품 정보 라벨 -->
+                    <aside class="reveal self-start rounded-3xl border border-line bg-surface p-7 shadow-soft" style="--delay: 120ms" aria-label="작가 정보">
+                        <p class="font-display text-lg italic text-accent">About the Artist</p>
+                        <dl class="mt-5 space-y-4 text-[15px]">
+                            <div><dt class="text-sm text-ink-soft">이름</dt><dd class="mt-0.5 font-medium">김도윤</dd></div>
+                            <div><dt class="text-sm text-ink-soft">역할</dt><dd class="mt-0.5 font-medium">큐레이터 · iOS 개발자 지망생</dd></div>
+                            <div><dt class="text-sm text-ink-soft">관심</dt><dd class="mt-0.5 font-medium">유물 연구, 업무 자동화, iOS 앱</dd></div>
+                            <div><dt class="text-sm text-ink-soft">연락</dt><dd class="mt-0.5 font-medium break-all"><a class="underline decoration-accent/50 underline-offset-4 hover:decoration-accent" href="mailto:kdy0096@gmail.com">kdy0096@gmail.com</a></dd></div>
+                        </dl>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <!-- Room 02: 여정 -->
+        <section id="journey" class="section" aria-labelledby="journey-title">
+            <div class="mx-auto max-w-6xl px-5 md:px-8">
+                <div class="room-label reveal"><span class="room-num">Room 02</span><span class="room-line"></span><span>관람 동선</span></div>
+                <h2 id="journey-title" class="section-title reveal">여정</h2>
+
+                <ol class="timeline mt-14 max-w-3xl">
+                    <li class="timeline-item reveal" style="--dot: var(--blush)">
+                        <p class="timeline-chapter">Chapter 1</p>
+                        <h3 class="timeline-title">큐레이터</h3>
+                        <p class="timeline-text">유물과 대상을 정해 자료를 조사하고, 어떤 전시를 열지 고민하며 하루를 보냅니다.</p>
+                    </li>
+                    <li class="timeline-item reveal" style="--dot: var(--butter)">
+                        <p class="timeline-chapter">Chapter 2</p>
+                        <h3 class="timeline-title">첫 번째 휴직, 코드를 만나다</h3>
+                        <p class="timeline-text">육아휴직 기간에 Python과 iOS 개발을 처음 알게 되었습니다.</p>
+                    </li>
+                    <li class="timeline-item reveal" style="--dot: var(--mint)">
+                        <p class="timeline-chapter">Chapter 3</p>
+                        <h3 class="timeline-title">복직, 일이 달라지다</h3>
+                        <p class="timeline-text">Python으로 연구조사를 더 실용적이고 정확하게 다듬고, 몇몇 서류 작업을 자동화했습니다.</p>
+                    </li>
+                    <li class="timeline-item reveal" style="--dot: var(--sky)">
+                        <p class="timeline-chapter">Chapter 4</p>
+                        <h3 class="timeline-title">두 번째 휴직, 개발을 꿈꾸다</h3>
+                        <p class="timeline-text">집안일로 다시 휴직하며 개발자라는 꿈을 품게 되었습니다.</p>
+                    </li>
+                    <li class="timeline-item reveal" style="--dot: var(--lilac)">
+                        <p class="timeline-chapter">Chapter 5</p>
+                        <h3 class="timeline-title">AI 시대의 선택</h3>
+                        <p class="timeline-text">인공지능으로는 생산성을 높이고, 저는 컴퓨터에 대한 지식을 쌓아 가기로 했습니다. 그렇게 개발자 지망생이 되었습니다.</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Room 03: 기술 -->
+        <section id="skills" class="section" aria-labelledby="skills-title">
+            <div class="mx-auto max-w-6xl px-5 md:px-8">
+                <div class="room-label reveal"><span class="room-num">Room 03</span><span class="room-line"></span><span>소장품</span></div>
+                <h2 id="skills-title" class="section-title reveal">기술</h2>
+
+                <div class="mt-12 grid gap-6 md:grid-cols-3">
+                    <article class="caption-card reveal">
+                        <div class="caption-swatch bg-mint"><span>Py</span></div>
+                        <p class="caption-no">소장번호 D-001</p>
+                        <h3 class="caption-title">Python</h3>
+                        <p class="caption-meta">언어 · 기본</p>
+                        <p class="caption-text">연구조사를 더 정확하게 다듬고, 반복되는 서류 작업을 자동화하는 데 실제로 사용했습니다.</p>
+                        <ul class="chip-list"><li>자료 정리</li><li>업무 자동화</li><li>OpenCV</li></ul>
+                    </article>
+                    <article class="caption-card reveal" style="--delay: 100ms">
+                        <div class="caption-swatch bg-sky"><span>iOS</span></div>
+                        <p class="caption-no">소장번호 D-002</p>
+                        <h3 class="caption-title">iOS 개발</h3>
+                        <p class="caption-meta">SwiftUI · UIKit · 학습 중</p>
+                        <p class="caption-text">아이폰 앱을 직접 만들기 위해 SwiftUI와 UIKit을 공부하고 있습니다.</p>
+                        <ul class="chip-list"><li>SwiftUI</li><li>UIKit</li></ul>
+                    </article>
+                    <article class="caption-card reveal" style="--delay: 200ms">
+                        <div class="caption-swatch bg-blush"><span>Web</span></div>
+                        <p class="caption-no">소장번호 D-003</p>
+                        <h3 class="caption-title">Web</h3>
+                        <p class="caption-meta">HTML · CSS · JavaScript</p>
+                        <p class="caption-text">웹 페이지의 구조와 모양, 동작을 만드는 기본기를 익히고 있습니다.</p>
+                        <ul class="chip-list"><li>HTML</li><li>CSS</li><li>JavaScript</li></ul>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Room 04: 프로젝트 -->
+        <section id="projects" class="section" aria-labelledby="projects-title">
+            <div class="mx-auto max-w-6xl px-5 md:px-8">
+                <div class="room-label reveal"><span class="room-num">Room 04</span><span class="room-line"></span><span>상설 전시</span></div>
+                <h2 id="projects-title" class="section-title reveal">프로젝트</h2>
+                <p class="reveal mt-4 max-w-2xl text-ink-soft">박물관에서 일하며 Python으로 직접 풀어 본 문제들입니다.</p>
+
+                <!-- js/main.js의 renderProjects()가 채웁니다 -->
+                <div id="project-list" class="mt-12 grid gap-6 md:grid-cols-2"></div>
+            </div>
+        </section>
+
+        <!-- Room 05: 연락처 -->
+        <section id="contact" class="section" aria-labelledby="contact-title">
+            <div class="mx-auto max-w-6xl px-5 md:px-8">
+                <div class="room-label reveal"><span class="room-num">Room 05</span><span class="room-line"></span><span>방명록</span></div>
+                <h2 id="contact-title" class="section-title reveal">연락</h2>
+
+                <div class="guestbook reveal mt-12 rounded-[2rem] border border-line bg-surface px-6 py-14 text-center shadow-soft sm:px-12">
+                    <p class="font-sans text-xl leading-relaxed sm:text-2xl">전시를 보고 남기고 싶은 말이 있다면,<br>편하게 편지를 보내 주세요.</p>
+                    <a href="mailto:kdy0096@gmail.com" class="mt-8 inline-block break-all font-display text-3xl italic text-accent sm:text-4xl">kdy0096@gmail.com</a>
+                    <div class="mt-10 flex flex-wrap justify-center gap-3">
+                        <a href="mailto:kdy0096@gmail.com" class="btn btn-primary">메일 보내기</a>
+                        <button id="copy-email" type="button" class="btn btn-ghost" data-email="kdy0096@gmail.com">주소 복사</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-line py-10">
+        <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-5 text-sm text-ink-soft sm:flex-row md:px-8">
+            <p>© <span id="footer-year">2026</span> 김도윤</p>
+            <p class="font-display text-base italic">Curated by 김도윤</p>
+        </div>
+    </footer>
+
+    <!-- 토스트 알림 -->
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
